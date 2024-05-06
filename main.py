@@ -1,3 +1,4 @@
+from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QApplication, QVBoxLayout, QLabel, QWidget, \
     QGridLayout, QLineEdit, QPushButton, QMainWindow, QTableWidget, QTableWidgetItem, \
     QDialog, QComboBox
@@ -53,7 +54,7 @@ class MainWindow(QMainWindow):
         dialog.exec()
 
     def search(self):
-        search_dialog = SearchDialog("")
+        search_dialog = SearchDialog()
         search_dialog.exec()
 
 class InsertDialog(QDialog):
@@ -122,7 +123,17 @@ class SearchDialog(QDialog):
         self.setLayout(layout)
 
     def search_names(self):
-        pass
+        name = self.search_box.text()
+        connection = sqlite3.connect('database.db')
+        cursor = connection.cursor()
+        sql = ("SELECT * FROM students WHERE name = ?")
+        results = cursor.execute(sql, (name, ))
+        rows = list(results)
+        print(rows)
+        items = main_window.table.findItems(name, Qt.MatchFlag.MatchFixedString)
+        for item in items:
+            print(item)
+            main_window.table.item(item.row(), 1).setSelected(True)
 
 
 if __name__ == "__main__":
